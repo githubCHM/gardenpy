@@ -1,3 +1,5 @@
+### (GardenPy is current a work-in-progress)
+
 (todo: logo)
 
 # GardenPy #
