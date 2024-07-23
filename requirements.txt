@@ -1,0 +1,10 @@
+torchvision~=0.18.1
+numpy~=1.26.1
+pygame~=2.5.2
+pillow~=10.2.0
+pandas~=2.2.1
+colorama~=0.4.6
+tqdm~=4.66.2
+seaborn~=0.13.2
+statsmodels~=0.14.2
+matplotlib~=3.8.3
