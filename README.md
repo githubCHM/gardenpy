@@ -62,7 +62,7 @@ Pre-built models will include default settings that make utilizing them fast and
 # todo
 ```
 
-Refer to Documentation(#documentation) for in-depth documentation for using **GardenPy**'s pre-built models.
+Refer to [Documentation](#documentation) for in-depth documentation for using **GardenPy**'s pre-built models.
 
 ### Advanced Usage
 **GardenPy**'s machine-learning library allows building models that, when written, read like mathematical notation for that model.
