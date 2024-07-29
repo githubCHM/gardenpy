@@ -53,29 +53,222 @@ It should be noted that not every dataset has a drawing script.
 
 To change what type of model is used in the drawing script, choose a model from the list of models.
 ```python
-# todo
+# model name
+model_type = 'dnn'
+# possible model names
+model_types = ['cnn', 'cnn_torch', 'dnn', 'dnn_torch']
 ```
 
 ### Basic Usage
 Though **GardenPy**'s pre-built models are simple to use, they allow for significant customization.
-Pre-built models will include default settings that make utilizing them fast and simple.
+Pre-built models include default settings that make utilizing them fast and simple.
+
+Utilizing default settings, a model could be trained in only a few lines of code.
 
 ```python
-# todo
+from gardenpy import DNN, DataLoaders
+
+##########
+
+# load dataset
+dataset = DataLoaders(
+    root=...,
+    values=...,
+    labels=...
+)
+
+##########
+
+# load model
+model = DNN()
+# initialize model
+model.initialize()
+# instantiate hyperparameters
+model.hyperparameters()
+# fit model
+model.fit(data=dataset)
+# save the trained model (optional)
+model.save(location=...)
+
 ```
+
+However, every aspect can still be edited in these pre-built models.
+
+```python
+from gardenpy import DNN, DataLoaders
+
+##########
+
+# load dataset
+dataset = DataLoaders(
+    root=...,
+    values=...,
+    labels=...,
+    batch_size=40,
+    shuffle=True,
+    save_to_memory=True
+    
+)
+
+##########
+
+# load model
+model = DNN(status_bars=True)
+
+# initialize model
+model.initialize(
+    hidden_layers=[100, 20],
+    thetas=[
+        # layer 1 initializer
+        {'weights': {'algorithm': 'xavier', 'gain': 1.0},
+         'biases': {'algorithm': 'zeros'}},
+        # layer 2 initializer
+        {'weights': {'algorithm': 'xavier', 'gain': 1.0},
+         'biases': {'algorithm': 'zeros'}},
+        # layer 3 initializer
+        {'weights': {'algorithm': 'xavier', 'gain': 1.0},
+         'biases': {'algorithm': 'zeros'}}
+    ],
+    activators=[
+        # layer 1 activator
+        {'algorithm': 'lrelu', 'beta': 0.1},
+        # layer 2 activator
+        {'algorithm': 'lrelu', 'beta': 0.1},
+        # layer 3 activator
+        {'algorithm': 'softmax'}
+    ]
+)
+
+# instantiate hyperparameters
+model.hyperparameters(
+    loss={'algorithm': 'centropy'},  # loss function
+    solver={
+        'algorithm': 'adam',  # optimization algorithm
+        'gamma': 1e-2,  # learning rate
+        'lambda_d': 0.01,  # L2 term
+        'beta1': 0.9,  # beta1 value
+        'beta2': 0.999,  # beta2 value
+        'epsilon': 1e-10,  # epsilon value
+        'ams': False  # AMS variant
+    }
+)
+
+# fit model
+model.fit(
+    data=dataset,
+    parameters={'epochs': 100_000, 'eval': True, 'eval_rate': 1_000}
+)
+
+# print general results
+model.results(
+    
+)
+
+# save the trained model (optional)
+model.save(location=...)
+
+```
+
+These pre-built models will take key-word arguments instead of dictionaries if desired.
 
 Refer to [Documentation](#documentation) for in-depth documentation for using **GardenPy**'s pre-built models.
 
 ### Advanced Usage
 **GardenPy**'s machine-learning library allows building models that, when written, read like mathematical notation for that model.
 
-Here is a comparison between a simple **GardenPy** model and its mathematical notation.
+Here is a comparison between a simple **GardenPy** model and its mathematical notation for a simple model that switches a 1 to a 0.
 
 #### Image
 (todo: image)
 #### Code
 ```python
-# todo
+from gardenpy import (
+    Tensor,
+    nabla,
+    chain,
+    Initializers,
+    Activators,
+    Losses,
+    Optimizers
+)
+
+##########
+
+epochs = 1000
+
+##########
+
+# initializer algorithms
+W_init = Initializers(algorithm='gaussian')
+B_init = Initializers(algorithm='zeros')
+
+# activation algorithms
+act1 = Activators(algorithm='sigmoid')
+act2 = Activators(algorithm='sigmoid')
+
+# loss algorithm
+loss = Losses(algorithm='ssr')
+
+# optimization algorithm
+optim = Optimizers(algorithm='sgd')
+
+##########
+
+# data
+X = Tensor([
+    [[0, 0]],
+    [[0, 1]],
+    [[1, 0]],
+    [[1, 1]]
+])
+Y = Tensor([
+    [[1, 1]],
+    [[1, 0]],
+    [[0, 1]],
+    [[0, 0]]
+])
+
+# weights
+W1 = W_init.initialize(2, 3)
+W2 = W_init.initialize(3, 2)
+
+# biases
+B1 = B_init.initialize(1, 3)
+B2 = B_init.initialize(1, 2)
+
+# activation & loss functions
+g_1 = act1.activate
+g_2 = act2.activate
+j = loss.loss
+
+##########
+
+for epoch in range(epochs):
+    # forward pass
+    X = X
+    a2 = g_1(X @ W1 + B1)
+    Yhat = g_2(a2 @ W2 + B2)
+
+    L = j(Yhat, Y)
+
+    # gradient calculation
+
+    grad_Yhat = nabla(L, Yhat)
+
+    grad_B2 = chain(grad_Yhat, nabla(Yhat, B2))
+    grad_W2 = chain(grad_Yhat, nabla(Yhat, W2))
+    grad_a2 = chain(grad_Yhat, nabla(Yhat, a2))
+
+    grad_B1 = chain(grad_a2, nabla(a2, B1))
+    grad_W1 = chain(grad_a2, nabla(a2, W1))
+
+    # optimization
+
+    W2 = optim.optimize(W2, grad_W2)
+    B2 = optim.optimize(B2, grad_B2)
+    W1 = optim.optimize(W1, grad_W1)
+    B1 = optim.optimize(B1, grad_B1)
+
 ```
 Refer to [Documentation](#documentation) for in-depth documentation for using **GardenPy**'s machine learning library.
 
